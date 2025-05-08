@@ -331,3 +331,25 @@ footer p{
 		z-index: 5; /* force menu above the content */
 	}
 }
+
+.spinner {
+  display: none;
+  opacity: 0;
+  max-width: 0;
+  -webkit-transition: opacity 0.25s, max-width 0.45s;
+  -moz-transition: opacity 0.25s, max-width 0.45s;
+  -o-transition: opacity 0.25s, max-width 0.45s;
+  transition: opacity 0.25s, max-width 0.45s;
+  /* Duration fixed since we animate additional hidden width */
+}
+
+.has-spinner > .spinner.active {
+  cursor: progress;
+}
+
+.has-spinner > .spinner.active  {
+  opacity: 1;
+  max-width: 50px;
+  display: inline-block;
+  /* More than it will ever come, notice that this affects on animation duration */
+}

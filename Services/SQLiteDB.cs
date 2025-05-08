@@ -417,6 +417,50 @@ namespace wow.tools.local.Services
             return SoundKitIDToBCTextID;
         }
 
+        // Get Creature Info (FileDataID and CreatureName) by creatureID
+        public static Dictionary<uint, string> GetCreatureInfoByID(int creatureID)
+        {
+            var creatureInfo = new Dictionary<uint, string>();
+
+            using (var cmd = dbConn.CreateCommand())
+            {
+                // We will need to get the creatureName from wow_creatures first
+                // and then use those creature names to get all fileDataIDs from wow_files_creature
+                cmd.CommandText = "SELECT name FROM wow_creatures WHERE creatureID = @creatureID";
+                cmd.Parameters.AddWithValue("@creatureID", creatureID);
+                var reader = cmd.ExecuteReader();
+                string? creatureName = null;
+                while (reader.Read())
+                {
+                    creatureName = reader["name"].ToString()!;
+                }
+                reader.Close();
+
+                if (string.IsNullOrEmpty(creatureName))
+                {
+                    return creatureInfo;
+                }
+                cmd.CommandText = "SELECT fileDataID FROM wow_files_creature WHERE creature = @creatureName";
+                cmd.Parameters.AddWithValue("@creatureName", creatureName);
+                reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    var fileDataID = uint.Parse(reader["fileDataID"].ToString()!);
+                    if (!creatureInfo.ContainsKey(fileDataID))
+                        creatureInfo[fileDataID] = creatureName!;
+                }
+                reader.Close();
+                
+            }
+
+            return creatureInfo;
+        }
+
+        public static Dictionary<uint, string> GetCreatureToFDIDMap()
+        {
+            return VOFDIDToCreatureNameCache.ToDictionary(x => (uint)x.Key, x => x.Value);
+        }
+
         public static int GetCreatureCount()
         {
             using (var cmd = dbConn.CreateCommand())
@@ -424,11 +468,6 @@ namespace wow.tools.local.Services
                 cmd.CommandText = "SELECT COUNT(*) FROM wow_creatures";
                 return int.Parse(cmd.ExecuteScalar()!.ToString()!);
             }
-        }
-
-        public static Dictionary<uint, string> GetCreatureToFDIDMap()
-        {
-            return VOFDIDToCreatureNameCache.ToDictionary(x => (uint)x.Key, x => x.Value);
         }
 
         public static Dictionary<uint, string> GetCreatureNames(int start = -1, int count = -1)
@@ -439,6 +478,7 @@ namespace wow.tools.local.Services
             {
                 if (start != -1 && count != -1)
                 {
+                    
                     cmd.CommandText = "SELECT creatureID, name FROM wow_creatures ORDER BY creatureID ASC LIMIT @start, @count ";
                     cmd.Parameters.AddWithValue("@start", start);
                     cmd.Parameters.AddWithValue("@count", count);

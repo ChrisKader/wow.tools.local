@@ -23,14 +23,31 @@ const setTheme = theme => {
     }
 
     document.querySelectorAll('[data-bs-theme-value]').forEach(toggle => {
-        const forTheme = toggle.getAttribute('data-bs-theme-value')
+        /* const forTheme = toggle.getAttribute('data-bs-theme-value')
         if (forTheme == theme) {
             toggle.classList.add("active")
         } else {
             toggle.classList.remove("active")
-        }
+        } */
+       toggle.textContent = theme.charAt(0).toUpperCase() + theme.slice(1);
     }
     );
+}
+
+const toggleTheme = () => {
+    const storedTheme = getStoredTheme()
+    // Toggle between dark, light and auto in that order
+    if (storedTheme === 'dark') {
+        setTheme('light')
+        setStoredTheme('light')
+    } else if (storedTheme === 'light') {
+        setTheme('auto')
+        setStoredTheme('auto')
+    } else {
+        setTheme('dark')
+        setStoredTheme('dark')
+    }
+
 }
 
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
@@ -54,6 +71,8 @@ $(function() {
         setTheme(getPreferredTheme())
     });
 
+    // Tooltip for the updateButton element to show the current update status info when moused over.
+
     $(document).on('init.dt', function (e, settings) {
         const pageInput = document.querySelector(".dt-paging-input input");
         if (pageInput) {
@@ -68,6 +87,14 @@ $(function() {
                 pageInput.dispatchEvent(new Event('input', { bubbles: true }));
             });
         }
+        [...document.querySelectorAll('[data-bs-toggle="tooltip"]')].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+        /* $("#updateButton").tooltip({
+            position: {
+                my: "right top",
+                at: "bottom right",
+                collision: "none"
+            }
+        }) */
     });
 });
 
@@ -76,6 +103,8 @@ function themeClick(theme) {
     setTheme(theme)
 }
 
+
+
 async function updateTitle() {
     if (Math.floor(Math.random() * 21) == 20) {
         document.getElementById("nocog").innerHTML = "<img src='/img/w.svg' alt='Logo W'><img src='/img/w.svg' alt='Logo W'><span>.tools <small><i>butt local</i></small></span>";
@@ -83,6 +112,7 @@ async function updateTitle() {
 }
 
 async function checkForUpdates(force = false) {
+    $("#updateButton > .spinner").toggleClass("active");
     if (document.cookie && !force) {
         newUpdateAvailable(JSON.parse(document.cookie).updateAvailable);
         return;
@@ -112,19 +142,22 @@ async function checkForUpdates(force = false) {
 
 function newUpdateAvailable(isUpdateAvailable) {
     var navBar = document.getElementsByTagName("nav");
-    var updateDiv = document.createElement("div");
+    var updateButton = document.getElementById("updateButton");
+
+    /* var updateDiv = document.createElement("div");
     updateDiv.id = 'updateDiv';
     if (isUpdateAvailable) {
         updateDiv.innerHTML = "<i class='fa fa-exclamation-circle' style='color: red'></i> <a href='https://github.com/marlamin/wow.tools.local/releases' target='_BLANK'>An update to version " + JSON.parse(document.cookie).latestVersion + " is available!</a> <a href='#' onClick='forceUpdateCheck()'><i class='fa fa-refresh'></i></a>";
     } else {
         updateDiv.innerHTML = "<i class='fa fa-check-circle' style='color: green;'></i> Up to date. <a style='cursor: pointer' onClick='forceUpdateCheck()'><i class='fa fa-refresh'></i></a>";
     }
-    navBar[0].appendChild(updateDiv);
+    navBar[0].appendChild(updateDiv); */
+    $("#updateButton > .spinner").toggleClass("active");
 }
 
 function forceUpdateCheck() {
-    var element = document.getElementById("updateDiv");
-    element.parentNode.removeChild(element);
+    //var element = document.getElementById("updateDiv");
+    //element.parentNode.removeChild(element);
     checkForUpdates(true);
 }
 
