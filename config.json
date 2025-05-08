@@ -1,17 +1,16 @@
 ﻿{
   "config": {
+    "definitionDir": "WoWDBDefs/definitions",
     "dbcFolder": "dbcs",
-    "definitionDir": "",
     "manifestFolder": "manifests",
     "listfileURL": "https://github.com/wowdev/wow-listfile/releases/latest/download/community-listfile-withcapitals.csv",
     "tactKeyURL": "https://github.com/wowdev/TACTKeys/raw/master/WoW.txt",
-    "wowFolder": "C:\\World of Warcraft",
+    "wowFolder": "/Applications/World of Warcraft",
     "wowProduct": "wow",
     "region": "eu",
     "locale": "enUS",
-    "showAllFiles": false,
+    "showAllFiles": true,
     "extractionDir": "extract",
-    "preferHighResTextures": false,
-    "useTACTSharp": false
+    "preferHighResTextures": false
   }
 }
